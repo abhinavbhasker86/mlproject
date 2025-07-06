@@ -23,6 +23,8 @@ from src.logger import logging            # Import logging for tracking events
 import pandas as pd                       # Import pandas for data manipulation
 from sklearn.model_selection import train_test_split  # Import for splitting data
 from dataclasses import dataclass          # Import dataclass for configuration class
+from src.components.data_transformation import DataTransformationConfig  # Import data transformation config
+from src.components.data_transformation import DataTransformation  # Import data transformation class
 
 @dataclass
 class DataIngestionConfig:
@@ -43,7 +45,7 @@ class DataIngestion:
         logging.info(f"Data Ingestion Config: {self.ingestion_config}")  # Log config details
         try:
             # Read the dataset from the specified CSV file
-            df = pd.read_csv('notebook/data/stud.csv')
+            df = pd.read_csv('notebook\data\stud.csv')
             logging.info("Dataset read as pandas dataframe")  # Log successful read
 
             # Ensure the directory for saving artifacts exists
@@ -55,6 +57,7 @@ class DataIngestion:
 
             # Split the dataset into training and testing sets (80% train, 20% test)
             train_set, test_set = train_test_split(df, test_size=0.2, random_state=42)
+
             # Save the training set to a CSV file
             train_set.to_csv(self.ingestion_config.train_data_path, index=False, header=True)
             # Save the testing set to a CSV file
@@ -68,13 +71,16 @@ class DataIngestion:
         except Exception as e:
             # Raise a custom exception with error details if any step fails
             raise CustomException(e, sys) from e    
-
+#'''
 if __name__ == "__main__":
     # If this script is run directly, create a DataIngestion object
     obj = DataIngestion()
     # Start the data ingestion process
-    obj.initiate_data_ingestion()
+    train_data,test_data = obj.initiate_data_ingestion()
     # Print a success message
+    data_transformation = DataTransformation()
+    data_transformation.initiate_data_transformation(train_data, test_data)
     print("Data Ingestion completed successfully")
+#'''
 # End of code
 # End of file
