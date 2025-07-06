@@ -39,7 +39,7 @@ class DataIngestionConfig:
 
 class DataIngestion:
     def __init__(self):
-        # Initialize configuration for data ingestion
+        # Initialize configuration for data ingestion.
         self.ingestion_config = DataIngestionConfig()
 
     def initiate_data_ingestion(self):
