@@ -5,6 +5,7 @@ import pandas as pd
 from src.exception import CustomException
 from src.logger import logging
 import dill
+import pickle
 from sklearn.metrics import r2_score
 from sklearn.model_selection import GridSearchCV
 
@@ -23,8 +24,8 @@ def save_object(file_path,obj):
         os.makedirs(dir_path, exist_ok=True)
 
         # Open the file in binary write mode and dump the object
-        with open(file_path, 'wb') as file_obj:
-            dill.dump(obj, file_obj)
+        with open(file_path, "wb") as file_obj:
+            pickle.dump(obj, file_obj)
         
         logging.info(f"Object saved successfully at {file_path}")
     
@@ -35,24 +36,51 @@ def evaluate_models(X_train, y_train, X_test, y_test, models,param):
     """
     Evaluate multiple regression models and return their R2 scores.
     """
-    model_report = {}
-    
-    for model_name, model in models.items():
-        try:
-            logging.info(f"Evaluating model: {model_name}, with parameters: {param[model_name]}")
-            para=param[model_name]
+    try:
+        report = {}
+
+        for i in range(len(list(models))):
+            model = list(models.values())[i]
+            para=param[list(models.keys())[i]]
+
             gs = GridSearchCV(model,para,cv=3)
-            gs.fit(X_train,y_train)			
+            gs.fit(X_train,y_train)
+
             model.set_params(**gs.best_params_)
-            model.fit(X_train, y_train)
+            model.fit(X_train,y_train)
+
+            #model.fit(X_train, y_train)  # Train model
+
             y_train_pred = model.predict(X_train)
+
             y_test_pred = model.predict(X_test)
-            train_model_r2_square = r2_score(y_train, y_train_pred)
-            test_model_r2_square = r2_score(y_test, y_test_pred)
-            model_report[model_name] = test_model_r2_square
-            logging.info(f"Test {model_name} R2 Score: {test_model_r2_square}")
-        except Exception as e:
-            #logging.error(f"Error evaluating {model_name}: {e}")
-            raise CustomException(e, sys)
+
+            train_model_score = r2_score(y_train, y_train_pred)
+
+            test_model_score = r2_score(y_test, y_test_pred)
+
+            report[list(models.keys())[i]] = test_model_score
+
+        return report
+
+    except Exception as e:
+        raise CustomException(e, sys)
+
+def load_object(file_path):
+    """
+    Load an object from a file using pickle.
+    """
+    try:
+        logging.info(f"Loading object from {file_path}")
+        logging.info(f"----------Going to Loading object----------")
+        # Open the file in binary read mode and load the object
+        with open(file_path, "rb") as file_obj:
+            logging.info(f"Object loaded successfully from {file_path}")
+            return pickle.load(file_obj)
+        
+        
+        #return obj
     
-    return model_report
+    except Exception as e:
+        raise CustomException(e, sys)
+    

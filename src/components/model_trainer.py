@@ -86,15 +86,10 @@ class ModelTrainer:
             }
 
             model_report:dict = evaluate_models(X_train, y_train, X_test, y_test, models,params)
-            '''
-            for model_name, model in models.items():
-                model.fit(X_train, y_train)
-                y_pred = model.predict(X_test)
-                r2_square = r2_score(y_test, y_pred)
-                model_report[model_name] = r2_square
-                logging.info(f"{model_name} R2 Score: {r2_square}")
-            '''
-            best_model_score = max(model_report.values())
+			
+			
+			
+            best_model_score = max(sorted(model_report.values()))
             best_model_name = list(model_report.keys())[
                 list(model_report.values()).index(best_model_score)
                 ]
@@ -115,9 +110,9 @@ class ModelTrainer:
                 file_path=self.model_trainer_config.trained_model_file_path,
                 obj=best_model
             )
-            #predicted_data = best_model.predict(X_test)
-            #r2_square = r2_score(y_test, predicted_data)
-            return best_model_name, best_model_score #, r2_square
+            predicted = best_model.predict(X_test)
+            r2_square = r2_score(y_test, predicted)
+            return best_model_name, best_model_score , r2_square
 
         except Exception as e:
-            raise CustomException(e, sys) from e
+            raise CustomException(e, sys) 

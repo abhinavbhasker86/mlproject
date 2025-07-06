@@ -29,8 +29,8 @@ class DataTransformation:
         
         '''
         try:
-            numerical_cols = ["writing_score", "reading_score"]
-            categorial_cols = [
+            numerical_columns = ["writing_score", "reading_score"]
+            categorical_columns = [
                 "gender",
                 "race_ethnicity",
                 "parental_level_of_education",
@@ -47,17 +47,17 @@ class DataTransformation:
             cat_pipeline = Pipeline(
                 steps=[
                 ("imputer", SimpleImputer(strategy="most_frequent")),
-                ("onehotencoder", OneHotEncoder()),
+                ("one_hot_encoder",OneHotEncoder()),
                 ("scaler", StandardScaler(with_mean=False))  # with_mean=False for sparse matrix support
             ])  
 
-            logging.info(f"Numerical columns: {numerical_cols}")
-            logging.info(f"Categorical columns: {categorial_cols}") 
+            logging.info(f"Categorical columns: {categorical_columns}")
+            logging.info(f"Numerical columns: {numerical_columns}")
             logging.info("Numerical columns scaling and categorical columns encoding completed")    
             preprocessor = ColumnTransformer(
-                transformers=[
-                    ("num_pipeline", num_pipeline, numerical_cols),
-                    ("cat_pipeline", cat_pipeline, categorial_cols)
+                [
+                    ("num_pipeline", num_pipeline, numerical_columns),
+                    ("cat_pipeline", cat_pipeline, categorical_columns)
                 ]
             )   
             logging.info("Preprocessor object created successfully")
@@ -96,7 +96,7 @@ class DataTransformation:
             logging.info("np.c_ conversion of target feature completed")
 
             train_arr = np.c_[input_feature_train_arr, np.array(target_feature_train_df)]
-            test_arr = np.c_[input_feature_test_arr, np.array(target_feature_test_df)] ##Abhi
+            test_arr = np.c_[input_feature_test_arr, np.array(target_feature_test_df)]
             
             logging.info("Preprocessing completed successfully")
             
@@ -108,10 +108,11 @@ class DataTransformation:
                 obj=preprocessing_obj
                 # "target_encoder": target_encoder
             ) 
-            
-            #os.makedirs(os.path.dirname(self.data_transformation_config.preprocessor_obj_file_path), exist_ok=True)
-            return (train_arr, test_arr, self.data_transformation_config.preprocessor_obj_file_path)
-            
+            return (
+                train_arr,
+                test_arr,
+                self.data_transformation_config.preprocessor_obj_file_path,
+            )
 
         except Exception as e:
             raise CustomException(e, sys)

@@ -1,21 +1,3 @@
-'''
-# File: src/components/data_ingestion.py
-# This code is part of a machine learning project that handles data ingestion, which is the process of reading data from a source, 
-# processing it, and saving it in a format suitable for training machine learning models. The code is structured to be modular and 
-# reusable, with clear logging and error handling.
-# The `DataIngestion` class is responsible for reading a dataset from a CSV file, splitting it into training and testing sets, 
-# and saving these sets to specified paths. It uses the `pandas` library for data manipulation and `sklearn` for splitting the dataset. 
-# The configuration for file paths is managed using a dataclass, which makes it easy to modify paths if needed.
-# The code also includes logging statements to track the progress of the data ingestion process, which is crucial for debugging 
-# and monitoring in production environments. It raises a custom exception if any errors occur during the ingestion process, providing 
-# detailed information about the error and the context in which it occurred.
-# The script can be run directly to execute the data ingestion process, and it prints a success message upon completion. 
-# This makes it easy to integrate into a larger machine learning pipeline, where data ingestion is often the first step before model training and evaluation.
-# The code is designed to be run in a Python environment with the necessary libraries installed, as specified in the `requirements.txt` file. It assumes that the dataset is available at the specified path and that the necessary directories for saving artifacts exist or can be created.
-# The code is also structured to be easily testable, with the main functionality encapsulated in the `DataIngestion` class and the `initiate_data_ingestion` method. This allows for unit testing and integration testing to ensure that the data ingestion process works as expected.
-# This code is a complete implementation of a data ingestion component in a machine learning project, providing a solid foundation for further development and integration with other components such as data preprocessing, model training, and evaluation.
-# File: src/components/data_ingestion.py  
-''' 
 import os
 import sys
 from src.exception import CustomException  # Import custom exception for error handling
@@ -25,7 +7,7 @@ from sklearn.model_selection import train_test_split  # Import for splitting dat
 from dataclasses import dataclass          # Import dataclass for configuration class
 from src.components.data_transformation import DataTransformationConfig  # Import data transformation config
 from src.components.data_transformation import DataTransformation  # Import data transformation class
-#from scr.components.model_trainer import ModelTrainerConfig   # Import model trainer config
+from src.components.model_trainer import ModelTrainerConfig   # Import model trainer config
 from src.components.model_trainer import ModelTrainer  # Import model trainer class
 
 @dataclass
@@ -68,25 +50,35 @@ class DataIngestion:
             logging.info("Train and Test data saved")  # Log train/test save
             logging.info("Ingestion of the Data is completed")  # Log completion
             # Return the paths to the train and test data files
-            return (self.ingestion_config.train_data_path, self.ingestion_config.test_data_path)
+            return (
+                    self.ingestion_config.train_data_path,
+                    self.ingestion_config.test_data_path
+                )
 
         except Exception as e:
             # Raise a custom exception with error details if any step fails
-            raise CustomException(e, sys) from e    
+            raise CustomException(e, sys)
 #'''
 if __name__ == "__main__":
     # If this script is run directly, create a DataIngestion object
      # Start the data ingestion process
-    obj = DataIngestion()
-   
-    train_data,test_data = obj.initiate_data_ingestion()
-    # Print a success message
-    data_transformation = DataTransformation()
-    train_arr,test_arr,_=data_transformation.initiate_data_transformation(train_data, test_data)
-    print("Data Ingestion completed successfully")
-    ModelTrainer= ModelTrainer()
-    ModelTrainer.initiate_model_trainer(train_array=train_arr, test_array=test_arr)
-    print(ModelTrainer.initiate_model_trainer(train_arr,test_arr))
+    try:
+        obj = DataIngestion()
+    
+        train_data,test_data = obj.initiate_data_ingestion()
+        # Print a success message
+        data_transformation = DataTransformation()
+        train_arr,test_arr,_=data_transformation.initiate_data_transformation(train_data, test_data)
+        print("Data Ingestion completed successfully")
+        modeltrainer= ModelTrainer()
+        print("modeltrainer completed successfully")
+        #ModelTrainer.initiate_model_trainer(train_array=train_arr,test_array=test_arr)
+        print("ModelTrainer.initiate_model_trainer completed successfully")
+        print(modeltrainer.initiate_model_trainer(train_arr, test_arr))
+    except Exception as e:
+        logging.info("Error in Data Ingestion")
+        raise CustomException(e, sys)
+    
 
 #'''
 # End of code
