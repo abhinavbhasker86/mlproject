@@ -25,6 +25,8 @@ from sklearn.model_selection import train_test_split  # Import for splitting dat
 from dataclasses import dataclass          # Import dataclass for configuration class
 from src.components.data_transformation import DataTransformationConfig  # Import data transformation config
 from src.components.data_transformation import DataTransformation  # Import data transformation class
+#from scr.components.model_trainer import ModelTrainerConfig   # Import model trainer config
+from src.components.model_trainer import ModelTrainer  # Import model trainer class
 
 @dataclass
 class DataIngestionConfig:
@@ -74,13 +76,18 @@ class DataIngestion:
 #'''
 if __name__ == "__main__":
     # If this script is run directly, create a DataIngestion object
+     # Start the data ingestion process
     obj = DataIngestion()
-    # Start the data ingestion process
+   
     train_data,test_data = obj.initiate_data_ingestion()
     # Print a success message
     data_transformation = DataTransformation()
-    data_transformation.initiate_data_transformation(train_data, test_data)
+    train_arr,test_arr,_=data_transformation.initiate_data_transformation(train_data, test_data)
     print("Data Ingestion completed successfully")
+    ModelTrainer= ModelTrainer()
+    ModelTrainer.initiate_model_trainer(train_array=train_arr, test_array=test_arr)
+    print(ModelTrainer.initiate_model_trainer(train_arr,test_arr))
+
 #'''
 # End of code
 # End of file
